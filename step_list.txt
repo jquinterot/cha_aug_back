@@ -1,0 +1,19 @@
+# Steps to set up GitHub Actions CI/CD with Docker Hub deployment
+
+1. Create a Docker Hub account (if you don't have one).
+2. Create a repository on Docker Hub for your image (e.g., johany/chat_aug_back).
+3. In your GitHub repo, go to Settings > Secrets and variables > Actions > New repository secret:
+   - Add DOCKERHUB_USERNAME (your Docker Hub username)
+   - Add DOCKERHUB_TOKEN (a Docker Hub access token or password)
+4. Create a .github/workflows/ci.yml file in your repo with the following steps:
+   - Checkout code
+   - Set up Python (if you want to run tests)
+   - (Optional) Install dependencies and run tests
+   - Log in to Docker Hub using secrets
+   - Build the Docker image (e.g., docker build -t johany/chat_aug_back:latest .)
+   - Push the image to Docker Hub
+5. Commit and push the workflow file to GitHub
+6. On every push to main (or on PR), the workflow will build and deploy the image to Docker Hub
+
+# Example workflow file: .github/workflows/ci.yml
+# (You can ask the assistant to generate this for you!) 

@@ -21,3 +21,11 @@ class UserResponse(BaseModel):
     email: EmailStr
     createdAt: datetime
     modifiedAt: datetime
+
+class UserLogin(BaseModel):
+    login: str  # can be username or email
+    password: str
+
+class Token(BaseModel):
+    access_token: str
+    token_type: str = "bearer"
