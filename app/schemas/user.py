@@ -14,3 +14,10 @@ class UserInDB(BaseModel):
     email: EmailStr
     createdAt: datetime
     modifiedAt: datetime
+
+class UserResponse(BaseModel):
+    id: Optional[str]
+    username: str
+    email: EmailStr
+    createdAt: datetime
+    modifiedAt: datetime
