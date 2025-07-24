@@ -1,0 +1,9 @@
+fastapi
+uvicorn
+pydantic
+sqlalchemy
+httpx
+python-dotenv
+email-validator
+motor
+python-jose
