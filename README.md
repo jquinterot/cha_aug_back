@@ -47,7 +47,7 @@ A best-practice FastAPI project for a chat app with OpenAI integration.
 
 Start the FastAPI server with:
 ```bash
-uvicorn app.main:app --reload
+uvicorn app.main:app --host 0.0.0.0 --port 8001 --reload
 ```
 
 The app will be available at [http://127.0.0.1:8000](http://127.0.0.1:8000)
