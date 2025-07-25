@@ -5,9 +5,9 @@ sqlalchemy
 httpx
 python-dotenv
 email-validator
-motor==3.7.1
+motor>=3.7.1,<4.0.0
 python-jose
-pymongo[srv]==4.9.0
+pymongo>=4.13.2,<5.0.0
 passlib[bcrypt]
 python-multipart
 openai
