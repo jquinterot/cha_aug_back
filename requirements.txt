@@ -8,3 +8,6 @@ email-validator
 motor==3.7.1
 python-jose
 pymongo[srv]==4.9.0
+passlib[bcrypt]
+python-multipart
+openai
