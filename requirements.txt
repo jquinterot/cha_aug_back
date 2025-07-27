@@ -11,3 +11,4 @@ pymongo>=4.13.2,<5.0.0
 passlib[bcrypt]
 python-multipart
 openai
+tenacity>=8.2.3
