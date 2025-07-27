@@ -1,8 +1,12 @@
 from fastapi import FastAPI, Request, HTTPException, status
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
+from fastapi.staticfiles import StaticFiles
 from typing import Callable, Awaitable, Any
-from app.api.v1.routes import chat
+import os
+from pathlib import Path
+
+from app.api.v1.routes import chat, rag
 from app.api.v1.routes import user
 
 app = FastAPI(title="Chat API")
@@ -37,6 +41,11 @@ async def auth_guard(request: Request, call_next: Callable[[Request], Awaitable[
 # Apply the middleware guard
 app.middleware("http")(auth_guard)
 
+# Include routers
 app.include_router(chat.router, prefix="/api/v1/chat", tags=["chat"])
+app.include_router(rag.router, prefix="/api/v1/rag", tags=["rag"])
 app.include_router(user.router, prefix="/api/v1/user", tags=["user"])
+
+# Create data directory if it doesn't exist
+os.makedirs("data/vector_store", exist_ok=True)
 # NOTE: Route is defined as "/" (no trailing slash), so prefix should not end with a slash.

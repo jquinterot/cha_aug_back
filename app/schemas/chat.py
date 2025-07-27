@@ -11,6 +11,12 @@ class ChatMessageCreate(BaseModel):
     user: str
     message: str
     model_type: Optional[ModelType] = ModelType.LOCAL
+    chat_history: Optional[list] = []
+
+class SourceDocument(BaseModel):
+    content: str
+    source: str
+    metadata: Optional[dict] = None
 
 class ChatMessageResponse(BaseModel):
     id: int
@@ -18,3 +24,4 @@ class ChatMessageResponse(BaseModel):
     message: str
     timestamp: datetime
     model_used: str
+    sources: list[SourceDocument] = []
