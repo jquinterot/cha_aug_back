@@ -24,7 +24,7 @@ def test_chat(question):
     payload = {
         "message": question,
         "chat_history": [],
-        "model_type": "local",
+        "model_type": "openai",
         "use_rag": True,
         "user": "test_user"
     }

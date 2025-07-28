@@ -23,7 +23,8 @@ def test_rag_query(question):
     payload = {
         "query": question,
         "chat_history": [],
-        "user": "test_user"
+        "user": "test_user",
+        "model_type": "openai"
     }
     
     headers = {
