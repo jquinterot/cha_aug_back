@@ -1,5 +1,20 @@
+import pytest
 import requests
 import json
+from typing import Generator
+
+# Test data
+TEST_QUESTIONS = [
+    "What is the capital of Zyxoria?",
+    "Who is the current leader of Zyxoria?",
+    "What is the main export of Zyxoria?",
+    "What is the population of Zyxoria?",
+    "What is the official language of Zyxoria?"
+]
+
+@pytest.fixture(params=TEST_QUESTIONS)
+def question(request):
+    return request.param
 
 def test_chat(question):
     """Test the chat endpoint with a question."""
@@ -11,7 +26,7 @@ def test_chat(question):
         "chat_history": [],
         "model_type": "local",
         "use_rag": True,
-        "user": "test_user"  # Add the required user field
+        "user": "test_user"
     }
     
     headers = {

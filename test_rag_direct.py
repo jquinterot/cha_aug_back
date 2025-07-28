@@ -1,5 +1,19 @@
+import pytest
 import requests
 import json
+
+# Test data
+RAG_TEST_QUESTIONS = [
+    "What is the capital of Zyxoria?",
+    "Who is the current leader of Zyxoria?",
+    "What is the main export of Zyxoria?",
+    "What is the population of Zyxoria?",
+    "What is the official language of Zyxoria?"
+]
+
+@pytest.fixture(params=RAG_TEST_QUESTIONS)
+def question(request):
+    return request.param
 
 def test_rag_query(question):
     """Test querying the RAG system directly with a question."""
@@ -8,7 +22,8 @@ def test_rag_query(question):
     # Prepare the request payload
     payload = {
         "query": question,
-        "chat_history": []
+        "chat_history": [],
+        "user": "test_user"
     }
     
     headers = {

@@ -267,3 +267,7 @@ This project uses:
 ## License
 
 [Your License Here]
+
+source venv/bin/activate && uvicorn app.main:app --reload
+
+pkill -f uvicorn

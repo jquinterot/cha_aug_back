@@ -54,14 +54,15 @@ async def chat_message(
                 print(f"\n[DEBUG] Sending query to RAG: {message.message}")
                 rag_response = await rag_service.generate_response(
                     query=message.message,
-                    chat_history=message.chat_history or []
+                    chat_history=message.chat_history or [],
+                    score_threshold=0.0  # Include all documents, even with low scores
                 )
                 
                 # Debug log the RAG response
                 print(f"[DEBUG] RAG Response: {rag_response}")
                 
                 # Extract answer and sources from RAG response
-                response_text = rag_response.get("answer", "I couldn't find an answer to your question.")
+                response_text = rag_response.answer if rag_response.answer else "I couldn't find an answer to your question."
                 sources = [
                     {
                         "content": src.get("content", ""),
@@ -72,28 +73,19 @@ async def chat_message(
                               if k not in ["source", "score"]}
                         }
                     }
-                    for src in rag_response.get("sources", [])
+                    for src in rag_response.sources
                 ]
                 
-                # If we have sources with good scores, use the RAG answer directly
-                if any(src.get("metadata", {}).get("score", 0) > 0.5 for src in sources):
-                    return ChatMessageResponse(
-                        id=1,  # In a real app, this would come from a database
-                        user=message.user,
-                        message=response_text,
-                        timestamp=datetime.utcnow(),
-                        model_used="rag",
-                        sources=sources
-                    )
-                
-                # Debug log the final response
+                # Always use the RAG response when we have one
                 print(f"[DEBUG] Final response text: {response_text}")
                 print(f"[DEBUG] Sources: {sources}")
                 
                 return ChatMessageResponse(
+                    id=1,  # In a real app, this would come from a database
+                    user=message.user,
                     message=response_text,
-                    model_used=ModelType.RAG.value,
                     timestamp=datetime.utcnow(),
+                    model_used=ModelType.RAG.value,
                     sources=sources
                 )
                 

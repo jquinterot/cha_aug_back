@@ -6,6 +6,7 @@ from typing import Optional
 class ModelType(str, Enum):
     LOCAL = "local"
     OPENAI = "openai"
+    RAG = "rag"
 
 class ChatMessageCreate(BaseModel):
     user: str

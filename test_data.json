@@ -1,0 +1,27 @@
+{
+  "company": {
+    "name": "Example Corp",
+    "founded": 2010,
+    "departments": ["Engineering", "Product", "Sales", "Marketing"],
+    "employees": 250,
+    "location": "San Francisco, CA",
+    "products": [
+      {
+        "name": "Product A",
+        "category": "Software",
+        "released": true,
+        "features": ["Cloud-based", "Scalable", "Secure"]
+      },
+      {
+        "name": "Product B",
+        "category": "Hardware",
+        "released": false,
+        "features": ["High-performance", "Energy-efficient"]
+      }
+    ]
+  },
+  "metadata": {
+    "last_updated": "2025-07-28",
+    "version": "1.0.0"
+  }
+}

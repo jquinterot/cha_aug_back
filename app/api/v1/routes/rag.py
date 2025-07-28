@@ -72,14 +72,16 @@ async def query_knowledge_base(request: QueryRequest):
             {
                 "content": src.get("content", ""),
                 "source": src.get("source", "unknown"),
-                "score": src.get("score", 0.0),
-                "metadata": src.get("metadata", {})
+                "metadata": {
+                    **src.get("metadata", {}),
+                    "score": src.get("score", 0.0)
+                }
             }
-            for src in rag_response.get("sources", [])
+            for src in rag_response.sources
         ]
         
         return QueryResponse(
-            answer=rag_response.get("answer", "I couldn't find an answer to your question."),
+            answer=rag_response.answer,
             sources=sources
         )
     except Exception as e:

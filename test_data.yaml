@@ -1,0 +1,69 @@
+# Sample YAML configuration for testing
+company:
+  name: "Tech Innovations Inc."
+  industry: "Artificial Intelligence"
+  founded: 2015
+  headquarters:
+    city: "San Francisco"
+    country: "USA"
+    employees: 150
+
+departments:
+  - name: "Research & Development"
+    head: "Dr. Sarah Chen"
+    team_size: 45
+    projects:
+      - name: "Neural Networks"
+        status: "In Progress"
+        start_date: 2024-01-15
+      - name: "Computer Vision"
+        status: "Active"
+        start_date: 2023-09-01
+
+  - name: "Product"
+    head: "Michael Johnson"
+    team_size: 25
+
+  - name: "Sales"
+    head: "Emily Rodriguez"
+    team_size: 30
+
+products:
+  - name: "AI Assistant Pro"
+    category: "Software"
+    version: 2.5.1
+    released: true
+    features:
+      - "Natural Language Processing"
+      - "Task Automation"
+      - "Multi-language Support"
+    pricing:
+      basic: 29.99
+      pro: 59.99
+      enterprise: "Contact Sales"
+
+  - name: "Data Analyzer"
+    category: "Analytics"
+    version: 1.2.0
+    released: true
+
+metrics:
+  monthly_active_users: 12500
+  customer_satisfaction: 4.8
+  support_tickets:
+    open: 24
+    resolved_this_week: 156
+
+settings:
+  environment: "production"
+  debug: false
+  features:
+    dark_mode: true
+    notifications: true
+    analytics: true
+
+# Metadata
+metadata:
+  last_updated: "2025-07-28"
+  version: "1.0.0"
+  author: "Documentation Team"
