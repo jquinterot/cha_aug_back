@@ -2,52 +2,59 @@
 Test script to verify RAG system only responds with knowledge base information
 for relevant queries and falls back to the base model for unrelated queries.
 """
-import requests
-import json
-from typing import Dict, List, Optional
+import pytest
+from typing import Dict, Any
 
-BASE_URL = "http://localhost:8000"
-
-def test_query(query: str, expected_source: str = "model") -> dict:
-    """
-    Send a test query to the chat endpoint and return the response.
-    
-    Args:
-        query: The query to test
-        expected_source: Expected source of the response ('rag' or 'model')
-    """
-    url = f"{BASE_URL}/api/v1/chat/"
-    payload = {
-        "user": "test_user",
-        "message": query,
-        "use_rag": True
+# Test cases for RAG relevance
+test_cases = [
+    {
+        "query": "What specific information is in the knowledge base about the project?",
+        "expected_source": "rag"
+    },
+    {
+        "query": "What is the capital of France?",
+        "expected_source": "model"
+    },
+    {
+        "query": "Can you explain the RAG implementation in this project?",
+        "expected_source": "rag"
+    },
+    {
+        "query": "Tell me a joke",
+        "expected_source": "model"
     }
+]
+
+@pytest.mark.parametrize("test_case", test_cases)
+def test_rag_relevance(test_client, test_case: Dict[str, Any]):
+    """
+    Test that the RAG system only responds with knowledge base information
+    for relevant queries and falls back to the base model for unrelated queries.
+    """
+    query = test_case["query"]
+    expected_source = test_case["expected_source"]
     
-    print(f"\nTesting query: {query}")
-    print(f"Expected source: {expected_source}")
+    # Send the query to the chat endpoint
+    response = test_client.post(
+        "/api/v1/chat/",
+        json={
+            "user": "test_user",
+            "message": query,
+            "use_rag": True
+        }
+    )
     
-    try:
-        response = requests.post(url, json=payload)
-        response.raise_for_status()
-        result = response.json()
-        
-        # Print the response
-        print(f"Response: {result.get('message', 'No response')[:200]}...")
-        print(f"Source: {result.get('model_used', 'unknown')}")
-        
-        # Check if the response source matches expectations
-        if expected_source.lower() == "rag" and result.get("model_used") != "rag":
-            print("❌ Expected RAG response but got model response")
-        elif expected_source.lower() == "model" and result.get("model_used") == "rag":
-            print("❌ Expected model response but got RAG response")
-        else:
-            print("✅ Response source matches expectation")
-            
-        return result
-        
-    except Exception as e:
-        print(f"Error: {str(e)}")
-        return {}
+    # Verify the response
+    assert response.status_code == 200, f"Request failed with status {response.status_code}"
+    result = response.json()
+    
+    # Check if the response source matches expectations
+    actual_source = result.get("model_used", "unknown").lower()
+    
+    if expected_source == "rag":
+        assert actual_source == "rag", f"Expected RAG response but got {actual_source} response"
+    else:
+        assert actual_source != "rag", f"Expected model response but got RAG response"
 
 def run_tests():
     """Run a series of test cases to verify RAG relevance filtering."""
@@ -73,7 +80,7 @@ def run_tests():
     
     results = []
     for query, expected_source in test_cases:
-        result = test_query(query, expected_source)
+        result = test_query(test_client, query, expected_source)
         results.append({
             "query": query,
             "expected_source": expected_source,
@@ -101,10 +108,27 @@ def run_tests():
         print(f"  Got: {result['actual_source']}")
         print(f"  Response: {result['response']}")
 
+def test_query(test_client, query, expected_source):
+    # Send the query to the chat endpoint
+    response = test_client.post(
+        "/api/v1/chat/",
+        json={
+            "user": "test_user",
+            "message": query,
+            "use_rag": True
+        }
+    )
+    
+    # Verify the response
+    assert response.status_code == 200, f"Request failed with status {response.status_code}"
+    result = response.json()
+    
+    return result
+
 if __name__ == "__main__":
     print("Starting RAG relevance tests...")
     print("This will test that the RAG system only responds with knowledge base")
     print("information for relevant queries and falls back to the base model for others.\n")
     
-    run_tests()
+    run_tests(test_client)
     print("\nTests completed!")

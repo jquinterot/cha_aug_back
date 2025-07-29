@@ -28,7 +28,7 @@ if __name__ == "__main__":
     time.sleep(2)
     
     # Index the test document
-    success = index_document("test_rag_document.pdf")
+    success = index_document("tests/data/test_rag_document.pdf")
     
     if success:
         print("\nDocument should now be indexed. You can verify by checking the vector store.")

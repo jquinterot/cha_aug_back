@@ -6,7 +6,7 @@ def index_test_document():
     rag_service = RAGService()
     
     # Path to the test document
-    test_doc_path = "test_rag_document.pdf"
+    test_doc_path = "tests/data/test_rag_document.pdf"
     
     if not os.path.exists(test_doc_path):
         print(f"Error: Test document not found at {test_doc_path}")

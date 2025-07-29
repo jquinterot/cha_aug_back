@@ -14,7 +14,7 @@ def test_yaml_loading():
     processor = DocumentProcessor()
     
     # Path to our test YAML file
-    yaml_path = str(Path(__file__).parent / "test_data.yaml")
+    yaml_path = str(Path(__file__).parent / "data" / "test_data.yaml")
     
     print(f"Loading YAML file: {yaml_path}")
     

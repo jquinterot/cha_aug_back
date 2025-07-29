@@ -53,4 +53,4 @@ def check_document_in_store(document_path):
         print(f"Error loading vector store: {e}")
 
 if __name__ == "__main__":
-    check_document_in_store("test_rag_document.pdf")
+    check_document_in_store("tests/data/test_rag_document.pdf")

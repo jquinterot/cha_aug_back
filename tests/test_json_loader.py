@@ -13,7 +13,7 @@ def test_json_loading():
     processor = DocumentProcessor()
     
     # Path to our test JSON file
-    json_path = str(Path(__file__).parent / "test_data.json")
+    json_path = str(Path(__file__).parent / "data" / "test_data.json")
     
     print(f"Loading JSON file: {json_path}")
     

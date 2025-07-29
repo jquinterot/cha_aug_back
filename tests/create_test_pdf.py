@@ -1,39 +1,43 @@
 from fpdf import FPDF
+import os
 
 def create_test_pdf():
+    # Create PDF object
     pdf = FPDF()
+    
+    # Add a page
     pdf.add_page()
+    
+    # Set font
     pdf.set_font("Arial", size=12)
     
-    # Add a title
-    pdf.cell(200, 10, txt="TEST DOCUMENT FOR RAG VALIDATION", ln=True, align='C')
-    pdf.ln(20)
+    # Add content
+    pdf.cell(200, 10, txt="Test Document for RAG System", ln=True, align='C')
+    pdf.ln(10)
     
-    # Add some unique test content
-    unique_info = """
-    SPECIAL_TEST_INFO_START
+    # Add some content
+    content = """This is a test PDF document for the RAG system. 
     
-    The capital of Zyxoria is Zyxtropolis.
-    The national dish is Zorblatt stew, made with purple tubers.
-    The official language is Zyxtongue, which has 14 vowels.
-    The currency is called Zorbs, and 1 Zorb equals 100 Zorblets.
-    The national animal is the Zorble, a six-legged mammal that glows in the dark.
+It contains information about artificial intelligence and machine learning. 
+
+Key points:
+- The capital of France is Paris
+- The largest planet in our solar system is Jupiter
+- Water boils at 100 degrees Celsius at sea level
+- The Earth's atmosphere is 78% nitrogen
+- The speed of light is approximately 300,000 km/s
+
+This document is used to test the RAG system's ability to extract and use information from PDFs."""
     
-    SPECIAL_TEST_INFO_END
-    
-    This document also contains general information about various topics:
-    - The average human attention span is 8.25 seconds
-    - Honey never spoils. Archaeologists have found pots of honey in ancient Egyptian tombs
-    - Octopuses have three hearts
-    """
-    
-    pdf.multi_cell(0, 10, txt=unique_info)
+    # Add multi-cell text
+    pdf.multi_cell(0, 10, txt=content)
     
     # Save the PDF
-    output_path = "test_rag_document.pdf"
+    output_path = "test_document.pdf"
     pdf.output(output_path)
-    return output_path
+    
+    print(f"Created test PDF at: {os.path.abspath(output_path)}")
+    return os.path.abspath(output_path)
 
 if __name__ == "__main__":
-    path = create_test_pdf()
-    print(f"Test PDF created at: {path}")
+    create_test_pdf()
