@@ -1,0 +1,60 @@
+version: '3.8'
+
+services:
+  app:
+    build:
+      context: .
+      target: builder  # Build the builder stage first
+    image: rag-chat-app
+    container_name: rag_chat_app
+    restart: unless-stopped
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./app:/app/app
+      - ./vector_store:/app/vector_store
+      - ./.env:/app/.env
+    environment:
+      - PORT=8000
+      - MODEL_TYPE=${MODEL_TYPE:-local}  # Default to local model if not set
+      - MONGODB_URL=${MONGODB_URL:-mongodb://mongo:27017/rag_chat}
+      - OPENAI_API_KEY=${OPENAI_API_KEY:-}
+      # Add other environment variables as needed
+    depends_on:
+      - mongo
+    networks:
+      - rag-network
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 20s
+
+  mongo:
+    image: mongo:6.0
+    container_name: mongo
+    restart: always
+    environment:
+      MONGO_INITDB_DATABASE: rag_chat
+    volumes:
+      - mongodb_data:/data/db
+      - mongodb_config:/data/configdb
+    ports:
+      - "27017:27017"
+    networks:
+      - rag-network
+    healthcheck:
+      test: echo 'db.runCommand("ping").ok' | mongosh localhost:27017/test --quiet
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+
+networks:
+  rag-network:
+    driver: bridge
+
+volumes:
+  mongodb_data:
+  mongodb_config:

@@ -30,11 +30,14 @@ app/
 
 ## Prerequisites
 
-- Python 3.8+
+- Python 3.12+
+- Docker and Docker Compose
 - LM Studio running locally (for local model inference)
 - FAISS for vector storage (automatically installed via requirements.txt)
 
 ## Installation
+
+### Local Development
 
 1. **Clone the repository**
    ```bash
@@ -47,6 +50,66 @@ app/
    python3 -m venv .venv
    source .venv/bin/activate  # On Windows: .venv\Scripts\activate
    ```
+
+3. **Install dependencies**
+   ```bash
+   pip install -r requirements.txt
+   ```
+
+### Docker Setup
+
+1. **Build and start the containers**
+   ```bash
+   # Copy the example environment file
+   cp .env.example .env
+   
+   # Edit .env file with your configuration
+   # At minimum, set OPENAI_API_KEY if using OpenAI model
+   
+   # Start the application with Docker Compose
+   docker-compose up --build -d
+   ```
+
+2. **Verify the containers are running**
+   ```bash
+   docker-compose ps
+   ```
+   You should see both `rag_chat_app` and `mongo` services running.
+
+3. **View logs**
+   ```bash
+   # View all logs
+   docker-compose logs -f
+   
+   # View logs for a specific service
+   docker-compose logs -f app
+   ```
+
+4. **Stop the application**
+   ```bash
+   docker-compose down
+   ```
+
+## Environment Variables
+
+Create a `.env` file in the root directory with the following variables:
+
+```env
+# Application
+PORT=8000
+MODEL_TYPE=local  # or 'openai' to use OpenAI API
+
+# OpenAI (required if MODEL_TYPE=openai)
+OPENAI_API_KEY=your_openai_api_key
+
+# MongoDB
+MONGODB_URL=mongodb://mongo:27017/rag_chat
+
+# LM Studio (for local model)
+LM_STUDIO_URL=http://host.docker.internal:1234  # On Linux, use your host IP
+```
+
+> **Note**: When running in Docker, use `host.docker.internal` to connect to services on your host machine (like LM Studio). On Linux, you might need to use `--add-host=host.docker.internal:host-gateway` in your Docker command.
 
 3. **Install dependencies**
    ```bash

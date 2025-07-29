@@ -14,14 +14,41 @@ router = APIRouter()
 
 def is_knowledge_query(message: str) -> bool:
     """Determine if a message is a knowledge-base query."""
-    # These patterns indicate a knowledge query
-    question_words = ['what', 'who', 'when', 'where', 'why', 'how', 'which', 'tell me', 'do you know']
-    message_lower = message.lower()
+    if not message or not message.strip():
+        return False
+        
+    message_lower = message.lower().strip()
     
-    # Check for question marks or question words
-    return ('?' in message or 
-            any(word in message_lower for word in question_words) or
-            message_lower.startswith(tuple(question_words)))
+    # Skip common greetings and simple phrases
+    simple_phrases = [
+        'hello', 'hi', 'hey', 'greetings',
+        'thanks', 'thank you',
+        'ok', 'okay', 'got it'
+    ]
+    
+    if any(phrase in message_lower.split() for phrase in simple_phrases):
+        return False
+    
+    # These patterns indicate a knowledge query
+    question_words = [
+        'what', 'who', 'when', 'where', 'why', 'how', 'which', 
+        'tell me', 'do you know', 'can you tell me', 'what is', 'who is'
+    ]
+    
+    # Check for question marks or question words at start of message
+    if ('?' in message or 
+        any(message_lower.startswith(word) for word in question_words)):
+        return True
+        
+    # Check for question words anywhere in the message
+    if any(f' {word} ' in f' {message_lower} ' for word in question_words):
+        return True
+        
+    # If it's a very short message (1-2 words), it's likely a lookup
+    if len(message.split()) <= 2:
+        return True
+        
+    return False
 
 @router.post("/", response_model=ChatMessageResponse)
 async def chat_message(
@@ -63,52 +90,59 @@ async def chat_message(
                 
                 # Extract answer and sources from RAG response
                 response_text = rag_response.answer if rag_response.answer else "I couldn't find an answer to your question."
-                sources = [
-                    {
-                        "content": src.get("content", ""),
-                        "source": src.get("source", "unknown"),
-                        "metadata": {
-                            "score": src.get("score", 0.0),
-                            **{k: v for k, v in src.get("metadata", {}).items() 
-                              if k not in ["source", "score"]}
-                        }
-                    }
+                
+                # Only use RAG response if we have valid sources with content
+                has_relevant_sources = any(
+                    src.get('content') and len(src.get('content', '').strip()) > 10 
                     for src in rag_response.sources
-                ]
-                
-                # Always use the RAG response when we have one
-                print(f"[DEBUG] Final response text: {response_text}")
-                print(f"[DEBUG] Sources: {sources}")
-                
-                return ChatMessageResponse(
-                    id=1,  # In a real app, this would come from a database
-                    user=message.user,
-                    message=response_text,
-                    timestamp=datetime.utcnow(),
-                    model_used=ModelType.RAG.value,
-                    sources=sources
                 )
                 
+                if has_relevant_sources:
+                    sources = [
+                        {
+                            "content": src.get("content", ""),
+                            "source": src.get("source", "unknown"),
+                            "metadata": {
+                                "score": src.get("score", 0.0),
+                                **{k: v for k, v in src.get("metadata", {}).items() 
+                                  if k not in ["source", "score"]}
+                            }
+                        }
+                        for src in rag_response.sources
+                    ]
+                    
+                    print(f"[DEBUG] Using RAG response with {len(sources)} sources")
+                    return ChatMessageResponse(
+                        id=1,
+                        user=message.user,
+                        message=response_text,
+                        timestamp=datetime.utcnow(),
+                        model_used=ModelType.RAG.value,
+                        sources=sources
+                    )
+                else:
+                    print("[DEBUG] No relevant sources found, falling back to base model")
+                
             except Exception as e:
-                # If RAG fails, fall back to regular response
-                print(f"RAG query failed: {str(e)}")
+                print(f"[ERROR] RAG query failed: {str(e)}")
         
-        # If not a knowledge query or RAG didn't find relevant info, use the regular model
+        # If not a knowledge query, RAG had no relevant sources, or RAG failed
+        print(f"[DEBUG] Using base model: {model_type}")
         if model_type == ModelType.OPENAI:
             response_text = await get_openai_response(message.message)
         else:  # LOCAL
             response_text = await get_local_model_response(
                 user_message=message.message,
-                model="llama-3.2-3b-instruct"  # Default model, can be made configurable
+                model="llama-3.2-3b-instruct"
             )
             
         return ChatMessageResponse(
-            id=1,  # In a real app, this would come from a database
+            id=1,
             user=message.user,
             message=response_text,
             timestamp=datetime.utcnow(),
             model_used=model_type.value,
-            sources=sources
+            sources=sources  # Will be empty for base model responses
         )
         
     except Exception as e:
