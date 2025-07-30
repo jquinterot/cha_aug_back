@@ -50,5 +50,18 @@ RUN mkdir -p /app/vector_store
 # Expose the port the app runs on
 EXPOSE $PORT
 
-# Use gunicorn for production
-CMD ["gunicorn", "app.main:app", "--workers", "4", "--worker-class", "uvicorn.workers.UvicornWorker", "--bind", "0.0.0.0:${PORT}"]
+# Install gunicorn and uvicorn in the runtime stage
+RUN pip install --no-cache-dir gunicorn uvicorn[standard]
+
+# Ensure the directory for the socket exists
+RUN mkdir -p /var/run/gunicorn
+
+# Create a non-root user to run the application
+RUN useradd -m appuser && \
+    chown -R appuser:appuser /app
+
+# Switch to non-root user
+USER appuser
+
+# Use a shell form of CMD to ensure environment variables are properly expanded
+CMD ["gunicorn", "--bind", "0.0.0.0:8000", "--workers", "4", "--worker-class", "uvicorn.workers.UvicornWorker", "--timeout", "120", "app.main:app"]
