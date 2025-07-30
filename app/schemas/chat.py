@@ -11,7 +11,7 @@ class ModelType(str, Enum):
 class ChatMessageCreate(BaseModel):
     user: str
     message: str
-    model_type: Optional[ModelType] = ModelType.LOCAL
+    model_type: Optional[ModelType] = ModelType.OPENAI  # Changed default to OPENAI
     chat_history: Optional[list] = []
 
 class SourceDocument(BaseModel):

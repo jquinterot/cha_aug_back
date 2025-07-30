@@ -1,7 +1,6 @@
 from fastapi import APIRouter, HTTPException, Query, Depends
 from app.schemas.chat import ChatMessageCreate, ChatMessageResponse, ModelType
 from app.services.openai_service import get_openai_response
-from app.services.local_model_service import get_local_model_response
 from app.services.rag_service import RAGService
 from datetime import datetime
 from typing import Optional, List
@@ -54,7 +53,7 @@ def is_knowledge_query(message: str) -> bool:
 async def chat_message(
     message: ChatMessageCreate,
     model_type: ModelType = Query(
-        ModelType.LOCAL,
+        ModelType.OPENAI,
         description="The model to use for generating responses"
     ),
     use_rag: bool = Query(
@@ -126,15 +125,9 @@ async def chat_message(
             except Exception as e:
                 print(f"[ERROR] RAG query failed: {str(e)}")
         
-        # If not a knowledge query, RAG had no relevant sources, or RAG failed
-        print(f"[DEBUG] Using base model: {model_type}")
-        if model_type == ModelType.OPENAI:
-            response_text = await get_openai_response(message.message)
-        else:  # LOCAL
-            response_text = await get_local_model_response(
-                user_message=message.message,
-                model="llama-3.2-3b-instruct"
-            )
+        # Always use OpenAI for the base model response
+        print(f"[DEBUG] Using OpenAI model for response")
+        response_text = await get_openai_response(message.message)
             
         return ChatMessageResponse(
             id=1,

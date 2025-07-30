@@ -3,7 +3,7 @@ from pydantic import BaseModel
 from langchain.schema import Document
 from .document_service import DocumentProcessor
 from .vector_store_service import VectorStoreService
-from .local_model_service import get_local_model_response
+from .openai_service import get_openai_response
 from .response_formatter import ResponseFormatter
 import os
 from dotenv import load_dotenv
@@ -252,7 +252,19 @@ class RAGService:
                     best_sentence = sentence
                     best_match_count = match_count
             
-            response_text = best_sentence if best_sentence else content
+            context = best_sentence if best_sentence else content
+            
+            # Format the prompt for OpenAI
+            prompt = f"""Based on the following context, please answer the question. If the context doesn't contain the answer, say you don't know.
+            
+            Question: {query}
+            
+            Context: {context}
+            
+            Answer:"""
+            
+            # Get response from OpenAI
+            response_text = await get_openai_response(prompt)
             
             formatted = ResponseFormatter.format_response(
                 response_text=response_text,
