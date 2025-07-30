@@ -37,6 +37,11 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     libgfortran5 \
     && rm -rf /var/lib/apt/lists/*
 
+# Create cache directories with proper permissions
+RUN mkdir -p /app/.cache/huggingface /app/.cache/torch /app/.cache/sentence_transformers && \
+    chown -R www-data:www-data /app/.cache && \
+    chmod -R 755 /app/.cache
+
 # Copy application code (excluding dependencies from builder)
 COPY --chown=www-data:www-data . .
 
@@ -45,7 +50,13 @@ ENV PYTHONPATH=/app \
     PYTHONUNBUFFERED=1 \
     PYTHONDONTWRITEBYTECODE=1 \
     PORT=8000 \
-    MODEL_TYPE=local
+    MODEL_TYPE=local \
+    # Set Hugging Face cache directories
+    TRANSFORMERS_CACHE=/app/.cache/huggingface/transformers \
+    HF_DATASETS_CACHE=/app/.cache/huggingface/datasets \
+    HF_HOME=/app/.cache/huggingface \
+    TORCH_HOME=/app/.cache/torch \
+    SENTENCE_TRANSFORMERS_HOME=/app/.cache/sentence_transformers
 
 # Install Python dependencies directly in the final image (not from builder)
 USER root
