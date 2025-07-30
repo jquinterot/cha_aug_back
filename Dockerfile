@@ -50,9 +50,14 @@ ENV PATH=/root/.local/bin:$PATH \
     MODEL_TYPE=local
 
 # Install uvicorn for production (system-wide for Azure compatibility)
+# Install as root first to ensure system-wide availability
+USER root
 RUN pip install --no-cache-dir uvicorn[standard]==0.30.6 && \
-    # Create a symlink for Azure compatibility
-    ln -sf /usr/local/bin/uvicorn /usr/bin/uvicorn
+    # Create symlinks for Azure compatibility
+    ln -sf /usr/local/bin/uvicorn /usr/bin/uvicorn && \
+    ln -sf /usr/local/bin/uvicorn /usr/local/bin/uvicorn3 && \
+    # Verify installation
+    python -c "import uvicorn; print(f'Uvicorn version: {uvicorn.__version__}')"
 
 # Create necessary directories with correct permissions
 RUN mkdir -p /app/vector_store && \
