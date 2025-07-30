@@ -8,7 +8,7 @@ services:
     image: rag-chat-app
     container_name: rag_chat_app
     restart: unless-stopped
-    command: python3 -m gunicorn --bind :8000 --workers 4 --worker-class uvicorn.workers.UvicornWorker --timeout 120 app.main:app
+    command: python -m uvicorn app.main:app --host 0.0.0.0 --port 8000
     ports:
       - "8000:8000"
     volumes:

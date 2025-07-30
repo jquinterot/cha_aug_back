@@ -47,8 +47,7 @@ ENV PATH=/root/.local/bin:$PATH \
     PYTHONUNBUFFERED=1 \
     PYTHONDONTWRITEBYTECODE=1 \
     PORT=8000 \
-    MODEL_TYPE=local \
-    GUNICORN_CMD_ARGS="--timeout 120 --workers=4 --worker-class=uvicorn.workers.UvicornWorker --bind=0.0.0.0:8000"
+    MODEL_TYPE=local
 
 # Create necessary directories with correct permissions
 RUN mkdir -p /app/vector_store && \
@@ -56,10 +55,8 @@ RUN mkdir -p /app/vector_store && \
     chown -R www-data:www-data /app && \
     chmod -R 755 /app
 
-# Install gunicorn and uvicorn system-wide (as root)
-RUN pip install --no-cache-dir gunicorn uvicorn[standard] && \
-    # Create a symlink in a system PATH location
-    ln -s /usr/local/bin/gunicorn /usr/bin/gunicorn
+# Install uvicorn for production
+RUN pip install --no-cache-dir uvicorn[standard]
 
 # Switch to non-root user for running the application
 USER www-data
@@ -70,8 +67,5 @@ WORKDIR /app
 # Expose the port the app runs on
 EXPOSE $PORT
 
-# Use www-data user (standard for Azure App Service)
-USER www-data
-
-# The command to run the application
-CMD ["gunicorn", "app.main:app"]
+# The command to run the application with Uvicorn directly using full path
+CMD ["python", "-m", "uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8000"]

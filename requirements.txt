@@ -41,7 +41,6 @@ tokenizers==0.21.2
 safetensors==0.5.3
 
 # Production Dependencies
-gunicorn==23.0.0
 uvloop==0.21.0
 httptools==0.6.4
 
