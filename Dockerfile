@@ -37,27 +37,29 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     libgfortran5 \
     && rm -rf /var/lib/apt/lists/*
 
-# Copy only the necessary files from builder
-COPY --from=builder /root/.local /root/.local
+# Copy application code (excluding dependencies from builder)
 COPY --chown=www-data:www-data . .
 
-# Ensure scripts in .local are usable
-ENV PATH=/root/.local/bin:$PATH \
-    PYTHONPATH=/app \
+# Environment variables
+ENV PYTHONPATH=/app \
     PYTHONUNBUFFERED=1 \
     PYTHONDONTWRITEBYTECODE=1 \
     PORT=8000 \
     MODEL_TYPE=local
 
-# Install uvicorn for production (system-wide for Azure compatibility)
-# Install as root first to ensure system-wide availability
+# Install Python dependencies directly in the final image (not from builder)
 USER root
-RUN pip install --no-cache-dir uvicorn[standard]==0.30.6 && \
+RUN pip install --no-cache-dir -r requirements.txt && \
+    # Install uvicorn system-wide for Azure compatibility
+    pip install --no-cache-dir uvicorn[standard]==0.30.6 && \
     # Create symlinks for Azure compatibility
     ln -sf /usr/local/bin/uvicorn /usr/bin/uvicorn && \
     ln -sf /usr/local/bin/uvicorn /usr/local/bin/uvicorn3 && \
-    # Verify installation
-    python -c "import uvicorn; print(f'Uvicorn version: {uvicorn.__version__}')"
+    # Verify installations
+    python -c "import uvicorn; print(f'Uvicorn version: {uvicorn.__version__}')" && \
+    # Clean up to reduce image size
+    pip cache purge && \
+    rm -rf /root/.cache/pip
 
 # Create necessary directories with correct permissions
 RUN mkdir -p /app/vector_store && \
