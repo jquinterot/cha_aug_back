@@ -49,6 +49,11 @@ ENV PATH=/root/.local/bin:$PATH \
     PORT=8000 \
     MODEL_TYPE=local
 
+# Install uvicorn for production (system-wide for Azure compatibility)
+RUN pip install --no-cache-dir uvicorn[standard]==0.30.6 && \
+    # Create a symlink for Azure compatibility
+    ln -sf /usr/local/bin/uvicorn /usr/bin/uvicorn
+
 # Create necessary directories with correct permissions
 RUN mkdir -p /app/vector_store && \
     # Set proper ownership and permissions
@@ -64,5 +69,9 @@ WORKDIR /app
 # Expose the port the app runs on
 EXPOSE $PORT
 
-# The command to run the application with Uvicorn directly using full path
-CMD ["python", "-m", "uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8000"]
+# Copy the startup script
+COPY --chown=www-data:www-data startup.sh /usr/local/bin/
+RUN chmod +x /usr/local/bin/startup.sh
+
+# The command to run the application with Uvicorn
+CMD ["/usr/local/bin/startup.sh"]
