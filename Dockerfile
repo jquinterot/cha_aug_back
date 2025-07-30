@@ -50,15 +50,22 @@ ENV PATH=/root/.local/bin:$PATH \
     MODEL_TYPE=local \
     GUNICORN_CMD_ARGS="--timeout 120 --workers=4 --worker-class=uvicorn.workers.UvicornWorker --bind=0.0.0.0:8000"
 
-# Install gunicorn and uvicorn in the runtime stage
-RUN pip install --no-cache-dir gunicorn uvicorn[standard] && \
-    # Create necessary directories with correct permissions
-    mkdir -p /app/vector_store && \
+# Create necessary directories with correct permissions
+RUN mkdir -p /app/vector_store && \
     # Set proper ownership and permissions
     chown -R www-data:www-data /app && \
-    chmod -R 755 /app && \
-    # Ensure gunicorn is in PATH
+    chmod -R 755 /app
+
+# Install gunicorn and uvicorn system-wide (as root)
+RUN pip install --no-cache-dir gunicorn uvicorn[standard] && \
+    # Create a symlink in a system PATH location
     ln -s /usr/local/bin/gunicorn /usr/bin/gunicorn
+
+# Switch to non-root user for running the application
+USER www-data
+
+# Set the working directory
+WORKDIR /app
 
 # Expose the port the app runs on
 EXPOSE $PORT
