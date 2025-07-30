@@ -33,7 +33,12 @@ lxml==6.0.0
 faiss-cpu==1.11.0.post1
 transformers==4.54.0
 torch==2.7.1
+torchvision
+torchaudio
 numpy==2.3.2
+huggingface-hub==0.34.1
+tokenizers==0.21.2
+safetensors==0.5.3
 
 # Production Dependencies
 gunicorn==23.0.0
@@ -51,3 +56,11 @@ black==25.1.0
 isort==6.0.1
 flake8==7.3.0
 mypy==1.16.1
+pylint==3.3.7
+
+# Additional Dependencies
+aiohttp==3.10.5  # Required for async HTTP requests
+cryptography==45.0.5  # Required for security features
+python-dateutil==2.9.0  # Date utilities
+tqdm==4.67.1  # Progress bars
+rich==14.0.0  # Rich text and beautiful formatting in the terminal
