@@ -55,9 +55,6 @@ RUN mkdir -p /app/vector_store && \
     chown -R www-data:www-data /app && \
     chmod -R 755 /app
 
-# Install uvicorn for production
-RUN pip install --no-cache-dir uvicorn[standard]
-
 # Switch to non-root user for running the application
 USER www-data
 
