@@ -49,7 +49,7 @@ app.include_router(user.router, prefix="/api/v1/user", tags=["user"])
 # Create data directory if it doesn't exist
 os.makedirs("data/vector_store", exist_ok=True)
 
-@app.get("/health", status_code=200, tags=["health"])
+@app.get("/api/v1/health", status_code=200, tags=["health"])
 async def health_check():
     """
     Health check endpoint for the application.
