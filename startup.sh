@@ -27,4 +27,4 @@ ls -la /app/.cache
 
 # Start the application
 echo -e "\n=== Starting Application ==="
-exec /usr/local/bin/python -m uvicorn app.main:app --host 0.0.0.0 --port 8000
+exec /usr/local/bin/python -m uvicorn app.main:app --host 0.0.0.0 --port 8000 --proxy-headers
