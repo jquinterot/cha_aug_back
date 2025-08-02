@@ -2,7 +2,15 @@ import requests
 import json
 
 def test_rag_query(question):
-    """Test querying the RAG system with a question."""
+    """
+    Test querying the RAG (Retrieval-Augmented Generation) system with a question.
+    
+    Args:
+        question (str): The question to ask the RAG system
+        
+    This function sends a request to the local RAG API endpoint and prints the response.
+    It's designed for testing the RAG functionality with different types of questions.
+    """
     url = "http://localhost:8000/api/v1/chat/"
     
     # Prepare the request payload
