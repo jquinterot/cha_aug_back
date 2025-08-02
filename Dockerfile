@@ -91,5 +91,9 @@ EXPOSE $PORT
 COPY --chown=www-data:www-data startup.sh /usr/local/bin/
 RUN chmod +x /usr/local/bin/startup.sh
 
+# Add health check
+HEALTHCHECK --interval=30s --timeout=10s --start-period=5s --retries=3 \
+  CMD wget --no-verbose --tries=1 --spider http://localhost:8000/health || exit 1
+
 # The command to run the application with Uvicorn
 CMD ["/usr/local/bin/startup.sh"]

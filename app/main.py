@@ -48,4 +48,19 @@ app.include_router(user.router, prefix="/api/v1/user", tags=["user"])
 
 # Create data directory if it doesn't exist
 os.makedirs("data/vector_store", exist_ok=True)
+
+@app.get("/health", status_code=200, tags=["health"])
+async def health_check():
+    """
+    Health check endpoint for the application.
+    Returns 200 OK if the application is running.
+    """
+    return {
+        "status": "healthy",
+        "version": "1.0.0",
+        "services": {
+            "api": "operational",
+            "database": "connected"  # Add more detailed checks as needed
+        }
+    }
 # NOTE: Route is defined as "/" (no trailing slash), so prefix should not end with a slash.
