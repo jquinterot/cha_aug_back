@@ -49,7 +49,7 @@ def is_knowledge_query(message: str) -> bool:
         
     return False
 
-@router.post("", response_model=ChatMessageResponse)
+@router.post("/message", response_model=ChatMessageResponse)
 async def chat_message(
     message: ChatMessageCreate,
     model_type: ModelType = Query(
