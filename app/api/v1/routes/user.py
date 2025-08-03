@@ -7,7 +7,7 @@ from fastapi import status
 from app.deps import get_current_user
 from passlib.context import CryptContext
 
-router = APIRouter()
+router = APIRouter(redirect_slashes=False)
 
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 

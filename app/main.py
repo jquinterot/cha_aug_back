@@ -9,7 +9,7 @@ from pathlib import Path
 from app.api.v1.routes import chat, rag
 from app.api.v1.routes import user
 
-app = FastAPI(title="Chat API")
+app = FastAPI(title="Chat API", redirect_slashes=False)
 
 # Allow all origins for development. Restrict in production!
 app.add_middleware(

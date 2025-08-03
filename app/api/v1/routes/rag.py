@@ -12,11 +12,10 @@ logger = logging.getLogger(__name__)
 from app.schemas.rag import AddDocumentsRequest, QueryRequest, QueryResponse, DocumentSourceType
 from app.services.rag_service import RAGService
 
-router = APIRouter()
+router = APIRouter(redirect_slashes=False)
 rag_service = RAGService()
 
-@router.post("/documents", response_model=dict, include_in_schema=False)
-@router.post("/documents/", response_model=dict)
+@router.post("/documents", response_model=dict)
 async def add_documents(request: AddDocumentsRequest):
     """
     Add documents to the knowledge base from a file or URLs
@@ -30,8 +29,7 @@ async def add_documents(request: AddDocumentsRequest):
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
-@router.post("/upload", response_model=dict, include_in_schema=False)
-@router.post("/upload/", response_model=dict)
+@router.post("/upload", response_model=dict)
 async def upload_document(file: UploadFile = File(...)):
     """
     Upload a document file to add to the knowledge base
@@ -55,8 +53,7 @@ async def upload_document(file: UploadFile = File(...)):
             os.unlink(temp_file_path)
         raise HTTPException(status_code=500, detail=str(e))
 
-@router.post("/query", response_model=QueryResponse, include_in_schema=False)
-@router.post("/query/", response_model=QueryResponse)
+@router.post("/query", response_model=QueryResponse)
 async def query_knowledge_base(request: QueryRequest):
     """
     Query the knowledge base with a question and return answer with sources
@@ -94,8 +91,7 @@ async def query_knowledge_base(request: QueryRequest):
             detail=f"Error querying knowledge base: {str(e)}"
         )
 
-@router.get("/health", response_model=dict, include_in_schema=False)
-@router.get("/health/", response_model=dict)
+@router.get("/health", response_model=dict)
 async def health_check():
     """Health check endpoint"""
     return {"status": "healthy"}
