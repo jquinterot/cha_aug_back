@@ -1,9 +1,10 @@
-from fastapi import APIRouter, HTTPException, Query, Depends
+from fastapi import APIRouter, HTTPException, Query, Depends, status
 from app.schemas.chat import ChatMessageCreate, ChatMessageResponse, ModelType
 from app.services.openai_service import get_openai_response
 from app.services.rag_service import RAGService
+from app.deps import get_current_user
 from datetime import datetime
-from typing import Optional, List
+from typing import Optional, List, Dict, Any
 import re
 
 # Create a single shared instance of RAGService
@@ -49,9 +50,10 @@ def is_knowledge_query(message: str) -> bool:
         
     return False
 
-@router.post("/message", response_model=ChatMessageResponse)
+@router.post("/message", response_model=ChatMessageResponse, status_code=status.HTTP_200_OK)
 async def chat_message(
     message: ChatMessageCreate,
+    current_user: Dict[str, Any] = Depends(get_current_user),
     model_type: ModelType = Query(
         ModelType.OPENAI,
         description="The model to use for generating responses"
@@ -113,7 +115,7 @@ async def chat_message(
                     print(f"[DEBUG] Using RAG response with {len(sources)} sources")
                     return ChatMessageResponse(
                         id=1,
-                        user=message.user,
+                        user=current_user["sub"],  # Use the authenticated user's ID
                         message=response_text,
                         timestamp=datetime.utcnow(),
                         model_used=ModelType.RAG.value,
@@ -131,7 +133,7 @@ async def chat_message(
             
         return ChatMessageResponse(
             id=1,
-            user=message.user,
+            user=current_user["sub"],  # Use the authenticated user's ID
             message=response_text,
             timestamp=datetime.utcnow(),
             model_used=model_type.value,
