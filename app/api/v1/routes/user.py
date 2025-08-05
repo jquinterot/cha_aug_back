@@ -1,9 +1,9 @@
-from fastapi import APIRouter, HTTPException, Depends
+from fastapi import APIRouter, HTTPException, Depends, status
+from typing import Dict, Any
 from app.schemas.user import UserCreate, UserInDB, UserResponse, UserLogin, Token
 from app.services.mongo_service import create_user, get_user_by_id, get_all_users, delete_user_by_id, get_user_by_username, get_user_by_login
 from app.services.jwt_service import create_access_token
 from datetime import datetime
-from fastapi import status
 from app.deps import get_current_user
 from passlib.context import CryptContext
 
@@ -58,3 +58,16 @@ async def delete_user(user_id: str):
     if not deleted:
         raise HTTPException(status_code=404, detail="User not found")
     return
+
+@router.get("/me", response_model=UserResponse)
+async def read_current_user(current_user: Dict[str, Any] = Depends(get_current_user)):
+
+    user = await get_user_by_id(current_user["sub"])
+    if not user:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="User not found"
+        )
+    # Remove sensitive information
+    user.pop("password", None)
+    return user
